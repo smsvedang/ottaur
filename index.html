@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OTT Cafe — Order Online</title>
+<style>
+:root{--bg:#f7f4ee;--card:#fff;--ink:#181818;--muted:#777;--accent:#e7a43b;--dark:#171717;--line:#ece8df;--danger:#d9534f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}
+.header{position:sticky;top:0;z-index:20;background:rgba(247,244,238,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{max-width:1180px;margin:auto;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.logo{width:48px;height:48px;border-radius:15px;object-fit:cover;background:#ddd}.brand{font-weight:900;font-size:20px}.tag{font-size:11px;color:var(--muted)}
+.cartBtn{margin-left:auto;background:var(--dark);color:#fff;border-radius:14px;padding:12px 16px;font-weight:800}
+.hero{max-width:1180px;margin:22px auto 0;padding:24px 18px;display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+.heroBox{background:var(--dark);color:#fff;border-radius:28px;padding:34px;min-height:230px;display:flex;flex-direction:column;justify-content:center}
+.heroBox h1{font-size:clamp(34px,5vw,62px);line-height:.98;margin:0 0 12px}.heroBox p{color:#d0d0d0;margin:0;max-width:560px}
+.heroSide{background:linear-gradient(135deg,#f1d7a7,#fff3d7);border-radius:28px;padding:28px;display:flex;flex-direction:column;justify-content:center}
+.heroSide strong{font-size:28px}.heroSide span{color:#655a4c;margin-top:7px}
+.wrap{max-width:1180px;margin:auto;padding:0 18px 100px}
+.tabs{display:flex;gap:9px;overflow:auto;padding:10px 0 18px;position:sticky;top:77px;z-index:10;background:var(--bg)}
+.tabs button{white-space:nowrap;padding:10px 15px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:750}.tabs button.active{background:var(--dark);color:#fff}
+.section{margin:18px 0 34px}.section h2{font-size:25px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px;display:flex;flex-direction:column;min-height:190px;box-shadow:0 5px 20px #00000005}
+.foodImg{width:100%;height:130px;border-radius:15px;object-fit:cover;background:#eee;margin-bottom:11px}.placeholder{display:flex;align-items:center;justify-content:center;font-size:40px}
+.card h3{font-size:16px;margin:0 0 6px}.desc{font-size:12px;color:var(--muted);min-height:18px}.price{font-weight:900;margin-top:auto;padding-top:12px}
+.add{margin-top:10px;width:100%;padding:11px;border-radius:12px;background:var(--dark);color:#fff;font-weight:800}
+.optionBtn{background:#fff;border:1px solid var(--line);padding:9px 10px;border-radius:11px;display:flex;justify-content:space-between;width:100%;margin-top:8px}
+.overlay{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:50}.overlay.show{display:flex}
+.sheet{background:#fff;width:min(620px,100%);max-height:88vh;overflow:auto;border-radius:25px 25px 0 0;padding:22px}
+.sheetHead{display:flex;align-items:center;justify-content:space-between}.close{background:#f2f2f2;border-radius:50%;width:38px;height:38px}
+.cartLine{display:flex;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}.cartLine main{flex:1}.qty{display:flex;align-items:center;gap:8px}.qty button{width:30px;height:30px;border-radius:9px;background:#f0eee9}.total{display:flex;justify-content:space-between;font-size:20px;font-weight:900;padding:18px 0}
+.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff}.primary{width:100%;padding:14px;border-radius:13px;background:var(--accent);font-weight:900}.notice{padding:12px;border-radius:12px;background:#f6f1e7;margin:10px 0;font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:35px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 17px;border-radius:999px;z-index:100;display:none}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:650px){.nav{padding:10px 13px}.hero{padding:13px;margin-top:8px}.heroBox{padding:25px;min-height:210px}.wrap{padding:0 13px 90px}.tabs{top:68px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:11px;border-radius:17px}.foodImg{height:105px}.brand{font-size:17px}}
+</style>
+</head>
+<body>
+<header class="header"><nav class="nav">
+<img id="logo" class="logo" alt="OTT">
+<div><div id="brand" class="brand">OTT Cafe</div><div id="tag" class="tag">Out Of The Town</div></div>
+<button class="cartBtn" onclick="openCart()">🛒 <span id="cartCount">0</span></button>
+</nav></header>
+<section class="hero"><div class="heroBox"><h1>Good food.<br>Good mood.</h1><p>Order your OTT favourites fresh from the cafe.</p></div><div class="heroSide"><strong>🍵 Tea from ₹20</strong><span>Choose your size while ordering — ₹20 / ₹30 / ₹40.</span></div></section>
+<div class="wrap"><div id="tabs" class="tabs"></div><main id="menu"></main></div>
+<div id="cartOverlay" class="overlay" onclick="if(event.target===this)closeCart()"><div class="sheet">
+<div class="sheetHead"><h2>Your Cart</h2><button class="close" onclick="closeCart()">×</button></div>
+<div id="cart"></div><div id="checkout"></div></div></div>
+<div id="productOverlay" class="overlay" onclick="if(event.target===this)closeProduct()"><div class="sheet" id="productSheet"></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const API="https://script.google.com/macros/s/AKfycbz7yb3tgktradoesZOjXJTDqoYoFt-AHOJfgXX_K8mNjaKBWMDr2vLvzLDrXFI7qbsn2Q/exec";
+let state={categories:[],settings:{},cart:[]};
+
+async function api(action,data={}){
+ const qs=new URLSearchParams({action,...data});
+ try{
+   const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...data})});
+   return await r.json();
+ }catch(e){
+   const r=await fetch(API+"?"+qs.toString());
+   return await r.json();
+ }
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function money(n){return "₹"+Number(n||0).toFixed(0)}
+function toast(x){const t=document.getElementById("toast");t.textContent=x;t.style.display="block";setTimeout(()=>t.style.display="none",2200)}
+async function init(){
+ const [m,s]=await Promise.all([api("getMenu"),api("getSettings")]);
+ if(!m.success){toast(m.error||"Menu failed");return}
+ state.categories=m.categories||[];state.settings=s.settings||{};
+ document.getElementById("brand").textContent=state.settings.cafeName||"OTT Cafe";
+ document.getElementById("tag").textContent=state.settings.tagline||"Out Of The Town";
+ if(state.settings.logo)document.getElementById("logo").src=state.settings.logo;
+ render();
+}
+function render(){
+ const tabs=document.getElementById("tabs"),menu=document.getElementById("menu");
+ tabs.innerHTML=state.categories.map((c,i)=>`<button class="${i===0?"active":""}" onclick="jump('${c.id}',this)">${esc(c.name)}</button>`).join("");
+ menu.innerHTML=state.categories.map(c=>`<section class="section" id="cat-${c.id}"><h2>${esc(c.name)}</h2><div class="grid">${c.products.map(card).join("")}</div></section>`).join("");
+ updateCount();
+}
+function card(p){
+ const has=p.variations&&p.variations.length;
+ const price=has?Math.min(...p.variations.map(v=>Number(v.price))):p.basePrice;
+ return `<article class="card">${p.image?`<img class="foodImg" src="${esc(p.image)}">`:`<div class="foodImg placeholder">☕</div>`}
+ <h3>${esc(p.name)}</h3><div class="desc">${esc(p.description||"")}</div><div class="price">${has?"From ":""}${money(price)}</div>
+ ${has?`<button class="add" onclick="chooseProduct('${p.id}')">Choose options</button>`:`<button class="add" onclick="add('${p.id}','')">Add to cart</button>`}</article>`;
+}
+function findProduct(id){for(const c of state.categories){const p=c.products.find(x=>String(x.id)===String(id));if(p)return p}}
+function chooseProduct(id){
+ const p=findProduct(id),s=document.getElementById("productSheet");
+ s.innerHTML=`<div class="sheetHead"><div><h2>${esc(p.name)}</h2><div class="desc">Choose an option</div></div><button class="close" onclick="closeProduct()">×</button></div>
+ ${p.variations.map(v=>`<button class="optionBtn" onclick="add('${p.id}','${v.id}');closeProduct()"><span>${esc(v.name)}</span><b>${money(v.price)}</b></button>`).join("")}`;
+ document.getElementById("productOverlay").classList.add("show");
+}
+function closeProduct(){document.getElementById("productOverlay").classList.remove("show")}
+function add(pid,vid){
+ const p=findProduct(pid);let v=(p.variations||[]).find(x=>String(x.id)===String(vid));
+ const key=pid+"_"+(vid||"base"),existing=state.cart.find(x=>x.key===key);
+ if(existing)existing.qty++;else state.cart.push({key,pid,vid,name:p.name,variation:v?v.name:"",price:v?Number(v.price):Number(p.basePrice),qty:1});
+ updateCount();toast("Added to cart");
+}
+function updateCount(){document.getElementById("cartCount").textContent=state.cart.reduce((a,x)=>a+x.qty,0)}
+function openCart(){renderCart();document.getElementById("cartOverlay").classList.add("show")}
+function closeCart(){document.getElementById("cartOverlay").classList.remove("show")}
+function change(key,d){const x=state.cart.find(x=>x.key===key);if(!x)return;x.qty+=d;if(x.qty<=0)state.cart=state.cart.filter(y=>y.key!==key);renderCart();updateCount()}
+function renderCart(){
+ const c=document.getElementById("cart"),ch=document.getElementById("checkout");
+ if(!state.cart.length){c.innerHTML=`<div class="empty">Your cart is empty 🍽️</div>`;ch.innerHTML="";return}
+ c.innerHTML=state.cart.map(x=>`<div class="cartLine"><main><b>${esc(x.name)}</b>${x.variation?`<div class="desc">${esc(x.variation)}</div>`:""}<div>${money(x.price*x.qty)}</div></main><div class="qty"><button onclick="change('${x.key}',-1)">−</button><b>${x.qty}</b><button onclick="change('${x.key}',1)">+</button></div></div>`).join("");
+ const total=state.cart.reduce((a,x)=>a+x.price*x.qty,0);
+ ch.innerHTML=`<div class="total"><span>Total</span><span>${money(total)}</span></div><div class="notice">Payment will be connected with Cashfree in the next step.</div>
+ <div class="field"><label>Name</label><input id="cn" placeholder="Your name"></div>
+ <div class="field"><label>Phone</label><input id="cp" inputmode="tel" placeholder="10-digit mobile number"></div>
+ <div class="field"><label>Order type</label><select id="co"><option value="pickup">Pickup</option><option value="dinein">Dine-in</option></select></div>
+ <div class="field"><label>Table number (optional)</label><input id="ct" placeholder="Table no."></div>
+ <div class="field"><label>Notes</label><textarea id="notes" rows="2" placeholder="Less spicy, etc."></textarea></div>
+ <button class="primary" onclick="placeOrder()">Place Order</button>`;
+}
+async function placeOrder(){
+ const name=document.getElementById("cn").value.trim(),phone=document.getElementById("cp").value.trim();
+ if(!name||!phone)return toast("Please enter name and phone");
+ const items=state.cart.map(x=>({productId:x.pid,variationId:x.vid,quantity:x.qty}));
+ const r=await api("createOrder",{customer:{name,phone,orderType:document.getElementById("co").value,tableNo:document.getElementById("ct").value,notes:document.getElementById("notes").value},items});
+ if(!r.success)return toast(r.error||"Order failed");
+ state.cart=[];updateCount();closeCart();
+ alert("Order placed! Order ID: "+r.orderId);
+}
+function jump(id,btn){document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");document.getElementById("cat-"+id)?.scrollIntoView({behavior:"smooth",block:"start"})}
+init();
+</script>
+</body>
+</html>
